@@ -1,9 +1,12 @@
 package com.example.supermarket;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.example.supermarket.model.Product;
+import com.example.supermarket.model.Sale;
 import com.example.supermarket.repository.ProductRepository;
+import com.example.supermarket.repository.SaleRepository;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +21,7 @@ public class SupermarketApplication {
 	}
 
 	@Bean
-	CommandLineRunner commandLineRunner(ProductRepository productRepository) {
+	CommandLineRunner commandLineRunner(ProductRepository productRepository, SaleRepository saleRepository) {
 		return args -> {
 			System.out.println("================== AQUI ==================");
 
@@ -32,6 +35,14 @@ public class SupermarketApplication {
 			productRepository.save(beansProduct);
 
 			System.out.println(productRepository.findAll());
+
+			Sale sale = new Sale();
+			sale.setProduct(sugarProduct);
+			sale.setQuantity(10);
+			sale.setSaleDateTime(LocalDateTime.now());
+			saleRepository.save(sale);
+
+			System.out.println(saleRepository.findAll());
 
 			System.out.println("================== AQUI ==================");
 		};
