@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ProductController {
 
-    private ProductService productService;
+    private final ProductService productService;
 
     @GetMapping
     List<Product> findAll() {
@@ -33,7 +33,7 @@ public class ProductController {
     }
 
     @GetMapping(value = "/{id}")
-    public Product findById(@PathVariable Long id) {
+    Product findById(@PathVariable Long id) {
         Optional<Product> product = productService.findById(id);
 
         if (!product.isPresent()) {
@@ -50,7 +50,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public void deleteById(@PathVariable Long id) {
+    void deleteById(@PathVariable Long id) {
         productService.deleteById(id);
     }
 }

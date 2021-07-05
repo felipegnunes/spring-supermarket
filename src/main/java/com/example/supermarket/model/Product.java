@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.Min;
 
 import lombok.Getter;
@@ -15,6 +16,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "products")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -31,12 +33,17 @@ public class Product {
     private BigDecimal price;
 
     @Min(0)
+    @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
     public Product(String name, BigDecimal price, Integer stockQuantity) {
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
+    }
+
+    public void decrementStockQuantity(Integer decrement) {
+        this.stockQuantity -= decrement;
     }
 
 }

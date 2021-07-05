@@ -3,6 +3,8 @@ package com.example.supermarket;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import javax.transaction.Transactional;
+
 import com.example.supermarket.model.Product;
 import com.example.supermarket.model.Sale;
 import com.example.supermarket.repository.ProductRepository;
@@ -21,6 +23,7 @@ public class SupermarketApplication {
 	}
 
 	@Bean
+	@Transactional
 	CommandLineRunner commandLineRunner(ProductRepository productRepository, SaleRepository saleRepository) {
 		return args -> {
 			System.out.println("================== AQUI ==================");
@@ -43,6 +46,9 @@ public class SupermarketApplication {
 			saleRepository.save(sale);
 
 			System.out.println(saleRepository.findAll());
+
+			productRepository.decrementStockQuantity(Long.valueOf(1), Integer.valueOf(2));
+			System.out.println(productRepository.findAll());
 
 			System.out.println("================== AQUI ==================");
 		};

@@ -12,5 +12,7 @@ public interface ProductService {
 
     Product save(Product product);
 
+    void decrementStockQuantity(Long productId, Integer quantity);
+
     void deleteById(Long id);
 }
