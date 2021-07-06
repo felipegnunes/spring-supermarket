@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class Product {
     private String name;
 
     @Column(precision = 8, scale = 2)
+    @DecimalMin(value = "0.0", inclusive = true)
     private BigDecimal price;
 
     @Min(0)

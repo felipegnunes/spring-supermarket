@@ -3,12 +3,10 @@ package com.example.supermarket;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import javax.transaction.Transactional;
-
 import com.example.supermarket.model.Product;
 import com.example.supermarket.model.Sale;
-import com.example.supermarket.repository.ProductRepository;
-import com.example.supermarket.repository.SaleRepository;
+import com.example.supermarket.service.ProductService;
+import com.example.supermarket.service.SaleService;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -23,34 +21,31 @@ public class SupermarketApplication {
 	}
 
 	@Bean
-	@Transactional
-	CommandLineRunner commandLineRunner(ProductRepository productRepository, SaleRepository saleRepository) {
+	CommandLineRunner commandLineRunner(ProductService productService, SaleService saleService) {
 		return args -> {
-			System.out.println("================== AQUI ==================");
+			System.out.println("================== CommandLineRunner ==================");
 
 			Product sugarProduct = new Product();
 			sugarProduct.setName("Açúcar");
 			sugarProduct.setPrice(new BigDecimal("3.99"));
 			sugarProduct.setStockQuantity(50);
-			productRepository.save(sugarProduct);
+			productService.save(sugarProduct);
 
 			Product beansProduct = new Product("Beans", new BigDecimal("11.79"), 70);
-			productRepository.save(beansProduct);
+			productService.save(beansProduct);
 
-			System.out.println(productRepository.findAll());
+			System.out.println(productService.findAll());
 
-			Sale sale = new Sale();
-			sale.setProduct(sugarProduct);
-			sale.setQuantity(10);
-			sale.setSaleDateTime(LocalDateTime.now());
-			saleRepository.save(sale);
+			Sale sugarSale = new Sale(sugarProduct, Integer.valueOf(10), LocalDateTime.now());
+			saleService.save(sugarSale);
 
-			System.out.println(saleRepository.findAll());
+			Sale beansSale = new Sale(beansProduct, Integer.valueOf(2), LocalDateTime.now());
+			saleService.save(beansSale);
 
-			productRepository.decrementStockQuantity(Long.valueOf(1), Integer.valueOf(2));
-			System.out.println(productRepository.findAll());
+			System.out.println(saleService.findAll());
+			System.out.println(productService.findAll());
 
-			System.out.println("================== AQUI ==================");
+			System.out.println("================== CommandLineRunner ==================");
 		};
 	}
 

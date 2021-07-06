@@ -1,24 +1,26 @@
 package com.example.supermarket.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.supermarket.dto.SaleDto;
+import javax.transaction.Transactional;
+
 import com.example.supermarket.model.Product;
 import com.example.supermarket.model.Sale;
 import com.example.supermarket.repository.SaleRepository;
 
+import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SaleServiceImpl implements SaleService {
 
-    private SaleRepository saleRepository;
-    private ProductService productService;
+    private final SaleRepository saleRepository;
+
+    private final ProductService productService;
 
     @Override
     public List<Sale> findAll() {
@@ -31,27 +33,21 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public Sale save(SaleDto saleDto) {
-        Optional<Product> product = productService.findById(saleDto.getProductId());
+    @Transactional
+    public Sale save(Sale sale) {
+        Product product = sale.getProduct();
 
-        if (!product.isPresent()) {
-            throw new Error("Product doesn't exist");
-        }
-
-        if (saleDto.getQuantity() > product.get().getStockQuantity()) {
+        if (sale.getQuantity() > product.getStockQuantity()) {
             throw new Error("You're trying to sell more items than the current stock has.");
         }
 
-        Sale sale = new Sale(product.get(), saleDto.getQuantity(), LocalDateTime.now());
+        productService.decrementStockQuantity(product.getId(), sale.getQuantity());
 
-        productService.decrementStockQuantity(product.get().getId(), sale.getQuantity());
-        saleRepository.save(sale);
-
-        return sale;
+        return saleRepository.save(sale);
     }
 
     @Override
     public void deleteById(Long id) {
-        // TODO Auto-generated method stub
+        throw new NotYetImplementedException();
     }
 }
