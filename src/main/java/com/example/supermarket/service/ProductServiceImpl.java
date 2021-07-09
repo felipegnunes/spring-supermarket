@@ -37,13 +37,11 @@ public class ProductServiceImpl implements ProductService {
     public Product findById(Long id) {
         Optional<Product> product = productRepository.findById(id);
 
-        throw new Error();
+        if (!product.isPresent()) {
+            throw new EntityNotFoundException();
+        }
 
-        // if (!product.isPresent()) {
-        // throw new EntityNotFoundException();
-        // }
-
-        // return product.get();
+        return product.get();
     }
 
     @Override
