@@ -3,6 +3,7 @@ package com.example.supermarket.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.supermarket.exception.EntityNotFoundException;
 import com.example.supermarket.model.Product;
 import com.example.supermarket.repository.ProductRepository;
 
@@ -33,8 +34,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Optional<Product> findById(Long id) {
-        return productRepository.findById(id);
+    public Product findById(Long id) {
+        Optional<Product> product = productRepository.findById(id);
+
+        if (!product.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        return product.get();
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import com.example.supermarket.dto.SaleDto;
-import com.example.supermarket.exception.NotFoundException;
+import com.example.supermarket.exception.EntityNotFoundException;
 import com.example.supermarket.model.Product;
 import com.example.supermarket.model.Sale;
 import com.example.supermarket.service.ProductService;
@@ -40,7 +40,7 @@ public class SaleController {
         Optional<Sale> sale = saleService.findById(id);
 
         if (!sale.isPresent()) {
-            throw new NotFoundException();
+            throw new EntityNotFoundException();
         }
 
         return sale.get();
@@ -48,13 +48,9 @@ public class SaleController {
 
     @PostMapping
     Sale save(@RequestBody @Valid SaleDto saleDto) {
-        Optional<Product> product = productService.findById(saleDto.getProductId());
+        Product product = productService.findById(saleDto.getProductId());
 
-        if (!product.isPresent()) {
-            throw new Error(String.format("There is no product with id %s", saleDto.getProductId()));
-        }
-
-        Sale newSale = new Sale(product.get(), saleDto.getQuantity(), LocalDateTime.now());
+        Sale newSale = new Sale(product, saleDto.getQuantity(), LocalDateTime.now());
 
         return saleService.save(newSale);
     }

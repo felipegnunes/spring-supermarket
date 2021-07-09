@@ -1,12 +1,10 @@
 package com.example.supermarket.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import com.example.supermarket.dto.ProductDto;
-import com.example.supermarket.exception.NotFoundException;
 import com.example.supermarket.model.Product;
 import com.example.supermarket.service.ProductService;
 
@@ -34,13 +32,8 @@ public class ProductController {
 
     @GetMapping(value = "/{id}")
     Product findById(@PathVariable Long id) {
-        Optional<Product> product = productService.findById(id);
-
-        if (!product.isPresent()) {
-            throw new NotFoundException();
-        }
-
-        return product.get();
+        Product product = productService.findById(id);
+        return product;
     }
 
     @PostMapping
