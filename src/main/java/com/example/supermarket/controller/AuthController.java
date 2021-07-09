@@ -1,77 +1,52 @@
 package com.example.supermarket.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 import com.example.supermarket.configuration.security.JwtTokenUtil;
 import com.example.supermarket.dto.LoginDto;
 import com.example.supermarket.dto.SignupDto;
 import com.example.supermarket.model.User;
-import com.example.supermarket.repository.UserRepository;
+import com.example.supermarket.model.UserRole;
+import com.example.supermarket.service.AuthService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/auth")
+@AllArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserRepository userRepository;
+    private AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody @Valid LoginDto request) {
-        try {
-            Authentication authenticate = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-            User user = (User) authenticate.getPrincipal();
+        User user = authService.login(request.getUsername(), request.getPassword());
 
-            return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, jwtTokenUtil.generateAccessToken(user))
-                    .body(user);
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, jwtTokenUtil.generateAccessToken(user)).body(user);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody @Valid SignupDto request) {
-        try {
-            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-            }
+    @RolesAllowed(UserRole.ADMIN)
+    public User signup(@RequestBody @Valid SignupDto request) {
+        Set<UserRole> authorities = new HashSet<>();
+        authorities.add(new UserRole(UserRole.CASHIER));
 
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-            }
+        User user = authService.signup(request.getUsername(), request.getEmail(), request.getPassword(), authorities);
 
-            String encodedPassword = passwordEncoder.encode(request.getPassword());
-            User newUser = new User(request.getUsername(), request.getEmail(), encodedPassword);
-            userRepository.save(newUser);
-
-            return ResponseEntity.ok().body(newUser);
-        } catch (Exception e) {
-            throw e;
-        }
+        return user;
     }
 
 }

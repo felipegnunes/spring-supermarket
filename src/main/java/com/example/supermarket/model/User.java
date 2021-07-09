@@ -18,7 +18,10 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.ToString;
+
 @Entity
+@ToString
 public class User implements UserDetails {
 
     @Id
@@ -63,6 +66,21 @@ public class User implements UserDetails {
     }
 
     @Override
+    public boolean isAccountNonExpired() {
+        return enabled;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return enabled;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return enabled;
+    }
+
+    @Override
     public String getUsername() {
         return username;
     }
@@ -88,18 +106,8 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return enabled;
+    public void setAuthorities(Set<UserRole> authorities) {
+        this.authorities = authorities;
     }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return enabled;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return enabled;
-    }
 }
