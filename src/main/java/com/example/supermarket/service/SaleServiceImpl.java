@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.example.supermarket.exception.EntityNotFoundException;
 import com.example.supermarket.model.Product;
 import com.example.supermarket.model.Sale;
 import com.example.supermarket.repository.SaleRepository;
@@ -28,8 +29,14 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public Optional<Sale> findById(Long id) {
-        return saleRepository.findById(id);
+    public Sale findById(Long id) {
+        Optional<Sale> sale = saleRepository.findById(id);
+
+        if (!sale.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        return sale.get();
     }
 
     @Override

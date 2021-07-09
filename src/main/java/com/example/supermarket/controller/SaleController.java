@@ -2,12 +2,10 @@ package com.example.supermarket.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import com.example.supermarket.dto.SaleDto;
-import com.example.supermarket.exception.EntityNotFoundException;
 import com.example.supermarket.model.Product;
 import com.example.supermarket.model.Sale;
 import com.example.supermarket.service.ProductService;
@@ -37,13 +35,8 @@ public class SaleController {
 
     @GetMapping(value = "/{id}")
     Sale findById(@PathVariable Long id) {
-        Optional<Sale> sale = saleService.findById(id);
-
-        if (!sale.isPresent()) {
-            throw new EntityNotFoundException();
-        }
-
-        return sale.get();
+        Sale sale = saleService.findById(id);
+        return sale;
     }
 
     @PostMapping
