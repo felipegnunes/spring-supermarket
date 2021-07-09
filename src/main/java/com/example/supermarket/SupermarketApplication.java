@@ -33,7 +33,7 @@ public class SupermarketApplication {
 
 			Set<UserRole> authorities = new HashSet<>();
 			authorities.add(new UserRole(UserRole.ADMIN));
-			authService.signup("mainadmin", "admin@supermarket.com", "adminpsw", authorities);
+			authService.signup("admin", "admin@supermarket.com", "adminpsw", authorities);
 			System.out.println(userRepository.findAll());
 
 			Product sugarProduct = new Product();

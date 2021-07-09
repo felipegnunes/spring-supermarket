@@ -3,11 +3,13 @@ package com.example.supermarket.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 import com.example.supermarket.dto.SaleDto;
 import com.example.supermarket.model.Product;
 import com.example.supermarket.model.Sale;
+import com.example.supermarket.model.UserRole;
 import com.example.supermarket.service.ProductService;
 import com.example.supermarket.service.SaleService;
 
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/sales")
 @RequiredArgsConstructor
+@RolesAllowed({ UserRole.CASHIER, UserRole.ADMIN })
 public class SaleController {
 
     private final SaleService saleService;
