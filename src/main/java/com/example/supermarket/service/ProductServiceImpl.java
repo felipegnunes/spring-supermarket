@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findById(Long id) {
+    public Product findById(Long id) throws EntityNotFoundException {
         Optional<Product> product = productRepository.findById(id);
 
         if (!product.isPresent()) {

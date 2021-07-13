@@ -1,22 +1,24 @@
 package com.example.supermarket.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
+import com.example.supermarket.exception.EntityNotFoundException;
 import com.example.supermarket.model.Product;
 import com.example.supermarket.repository.ProductRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
 
-@ExtendWith(MockitoExtension.class)
 public class ProductServiceTests {
-    @Mock
-    private ProductRepository productRepository;
+    private ProductRepository productRepository = Mockito.mock(ProductRepository.class);
 
     private ProductService productService;
 
@@ -26,17 +28,35 @@ public class ProductServiceTests {
     }
 
     @Test
-    void iCanDoATest() {
-        productService.findAll();
-        assertEquals(true, true);
+    void shouldSaveProduct() {
+        Product product = product();
+
+        when(productRepository.save(any(Product.class))).then(returnsFirstArg());
+        Product savedProduct = productService.save(product);
+
+        assertThat(savedProduct).isEqualTo(product);
     }
 
     @Test
-    void shouldCreateProduct() {
-        String productName = "Sugar";
+    void shouldFindProduct() {
+        Product product = product();
 
-        Product product = productService.save(new Product(productName, new BigDecimal("10.99"), 10));
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        Product foundProduct = productService.findById(1L);
 
-        assertEquals(product.getName(), productName);
+        assertThat(foundProduct).isEqualTo(product);
+    }
+
+    @Test
+    void shouldThrowWhenNotFound() {
+        when(productRepository.findById(1L)).thenThrow(new EntityNotFoundException());
+
+        assertThatThrownBy(() -> {
+            productService.findById(7L);
+        }).isInstanceOf(EntityNotFoundException.class);
+    }
+
+    Product product() {
+        return new Product("Sugar", new BigDecimal("10.99"), 10);
     }
 }
